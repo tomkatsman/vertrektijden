@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>RET vertrektijden</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Poppins" rel="stylesheet">
+	<style>
+		body {
+			margin: 0;
+			font-family: "Poppins", sans-serif;
+			-webkit-font-smoothing: antialiased;
+			background-color: #3980F9;
+		}
+
+		/* select {
+			width: 100%;
+			height: 50px;
+			padding: 10px;
+		} */
+
+		button {
+			color: #fff;
+			width: 49%;
+			height: 40px;
+			border-radius: 5px;
+			background-color: #9EBFFC;
+			border: 1px solid #ccc;
+		}
+
+		button.active {
+			background-color: #fff;
+			/* of een andere kleur */
+			font-weight: bold;
+			color: #3980F9;
+			border: none;
+		}
+
+		.metro-richting {
+			/* font-size: 15px; */
+			margin-bottom: 5px;
+			color: #9EBFFC;
+			/* font-weight: 700; */
+		}
+
+		.metro-a {
+			background-color: #27B492;
+			padding: 1px 4px;
+			color: #fff;
+			border-radius: 3px;
+		}
+
+		.metro-b {
+			background-color: #FACE29;
+			padding: 1px 4px;
+			color: #fff;
+			border-radius: 3px;
+		}
+
+		.metro-c {
+			background-color: #FF627D;
+			padding: 1px 4px;
+			color: #fff;
+			border-radius: 3px;
+		}
+
+		#wrapper header {
+			padding: 20px;
+		}
+
+		h1 {
+			color: #fff;
+		}
+
+		#wrapper main {
+			padding-top: 20px;
+			display: flex;
+			flex-direction: column;
+			row-gap: 10px;
+			/* margin: 20px; */
+			background-color: #F6F9FF;
+			border-radius: 20px 20px 0 0;
+		}
+
+		.departure {
+			margin: 0 20px 0 20px;
+			padding: 20px;
+			font-size: 12px;
+			/* background: #ccc; */
+			border-radius: 20px;
+			position: relative;
+			background-color: #fff;
+			color: #333;
+			/* border: 1px solid #ccc; */
+			/* border-bottom: 1px solid #333; */
+		}
+
+		.departure .eta {
+			font-size: 20px;
+			font-weight: bold;
+			margin-bottom: 5px;
+		}
+
+		.departure .vertrektijd {
+			position: absolute;
+			top: 50px;
+			right: 30px;
+		}
+
+		.departure .categorie {
+			color: #9EBFFC;
+		}
+
+		.departure.bad {
+			/* background: #9e3c3c; */
+		}
+
+		.departure.okay {
+			/* background: #dd7745; */
+		}
+
+		.departure.good {
+			/* background: #60754e; */
+		}
+
+		.vertrektijd {
+			font-weight: bold;
+			padding: 5px;
+			color: #fff;
+			border-radius: 3px;
+		}
+
+		.departure.bad .vertrektijd {
+			background-color: #9e3c3c;
+		}
+
+		.departure.okay .vertrektijd {
+			background-color: #dd7745;
+		}
+
+		.departure.good .vertrektijd {
+			background-color: #60754e;
+		}
+	</style>
+</head>
+
+<body>
+	<div id="wrapper">
+		<header>
+			<h1>Marconiplein</h1>
+			<!-- <select id="dropdown-perron">
+				<option value="1">Westwaards</option>
+				<option value="2">Oostwaards</option>
+			</select> -->
+			<button id="btn-oostwaards" data-perron="2">Oost</button>
+			<button id="btn-westwaards" data-perron="1">West</button>
+
+		</header>
+		<main></main>
+	</div>
+	<script src="script.js"></script>
+</body>
+
+</html>
