@@ -6,5 +6,3 @@ services:
       context: .
     ports:
       - "8080:80"
-  environment:
-      - GITHUB_TOKEN=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
