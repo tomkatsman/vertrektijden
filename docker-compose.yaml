@@ -1,0 +1,8 @@
+version: 'latest'
+
+services:
+  web:
+    build:
+      context: .
+    ports:
+      - "8080:80"
