@@ -10,7 +10,7 @@ app.options('*', cors());
 
 const port = process.env.PORT || 3000;
 
-var allowed_origins = ['http://localhost', 'http://homeassistant.local:8080', 'http://vertrektijden.tomkatsman.nl'];
+var allowed_origins = ['http://localhost', 'http://homeassistant.local:8080', 'https://vertrektijden.tomkatsman.nl'];
 
 app.listen(port, () => console.log("Server running on port " + port));
 
