@@ -1,6 +1,6 @@
 const wrapper = document.querySelector("#wrapper");
 const limit = 8;
-const base_url = window.location.hostname == "localhost" ? "http://localhost:3000" : "https://get-ret-times.onrender.com";
+const base_url = "http://localhost:3000";
 
 const now = new Date();
 const is_afternoon = now.getHours() > 13;
@@ -34,88 +34,72 @@ document.querySelectorAll('button').forEach(button => {
 populateDepartures();
 
 function populateDepartures() {
-	fetch(`${base_url}/getTimes/${halte}/${perron}`)
-		.then((response) => response.json())
-		.then((tijden) => {
-			const nu = new Date();
-			const vandaag = {
-				dag: nu.getDate(),
-				maand: (nu.getMonth() + 1),
-				jaar: nu.getFullYear()
-			}
+	console.log("populateDepartures wordt aangeroepen"); // Debug-log
+    fetch(`${base_url}/getTimes`)
+        .then((response) => response.json())
+        .then((tijden) => {
+            console.log("Ontvangen tijden:", tijden);
+            const nu = new Date();
+            const vandaag = {
+                dag: nu.getDate().toString().padStart(2, "0"),
+                maand: (nu.getMonth() + 1).toString().padStart(2, "0"),
+                jaar: nu.getFullYear()
+            };
 
-			if (vandaag.maand.length == 1) {
-				vandaag.maand = "0" + vandaag.maand;
-			}
+            wrapper.querySelector("main").innerHTML = "";
+            tijden.forEach((t, i) => {
+                if (i >= limit) return;
 
-			wrapper.querySelector("main").innerHTML = "";
-			tijden.forEach((t, i) => {
-				if (i >= limit) return;
-				const time = t.new_time || t.normal_time;
-				const parsed_time = Date.parse(`${vandaag.jaar}-${vandaag.maand}-${vandaag.dag}T${time}:00`);
-				const ETA = (parsed_time - nu) / 1000 / 60;
-				const looptijd = looptijden[halte];
-				const metro = t.metro;
-				const richting = t.richting;
+                const time = t.new_time || t.normal_time;
+                if (!time) {
+                    console.warn("Tijd ontbreekt voor item:", t);
+                    return;
+                }
 
-				const $el = document.createElement("div");
-				const $metroRichting = document.createElement("div"); // Nieuwe div voor metro en richting
+                const parsed_time = Date.parse(`${vandaag.jaar}-${vandaag.maand}-${vandaag.dag}T${time}:00`);
+                const ETA = (parsed_time - nu) / 1000 / 60;
 
-				const $metro = document.createElement("span"); // Gebruik span in plaats van div
-				const $richting = document.createElement("span"); // Gebruik span in plaats van div
-				const $tijd = document.createElement("div");
-				const $eta = document.createElement("div");
-				const $categorie = document.createElement("div");
+                if (isNaN(parsed_time)) {
+                    console.warn("Kon tijd niet parsen:", time);
+                    return;
+                }
 
-				const category = getCategoryText(ETA, looptijd);
+                const looptijd = looptijden[halte] || 0;
+                const category = getCategoryText(ETA, looptijd);
 
-				$el.classList.add("departure");
-				$el.classList.add(category.status);
+                const $el = document.createElement("div");
+                $el.classList.add("departure", category.status);
 
-				$metro.innerText = metro;
-				// $metro.classList.add("metro");
+                const $metroRichting = document.createElement("div");
+                const $metro = document.createElement("span");
+                const $richting = document.createElement("span");
+                const $tijd = document.createElement("div");
+                const $eta = document.createElement("div");
+                const $categorie = document.createElement("div");
 
-				// Voeg de juiste klasse toe op basis van de waarde van metro
-				if (metro === 'A') {
-					$metro.classList.add('metro-a');
-				} else if (metro === 'B') {
-					$metro.classList.add('metro-b');
-				} else if (metro === 'C') {
-					$metro.classList.add('metro-c');
-				}
+                $metro.innerText = t.metro || "Onbekend";
+                $metro.classList.add(`metro-${t.metro?.toLowerCase() || "unknown"}`);
+                $richting.innerText = t.richting || "Onbekend";
+                $tijd.innerText = time;
+                $eta.innerText = isNaN(ETA) ? "Onbekend" : `${Math.round(ETA)} min.`;
+                $categorie.innerText = category.text;
 
-				$richting.innerText = richting;
-				$richting.classList.add("richting");
+                $metroRichting.appendChild($metro);
+                $metroRichting.appendChild($richting);
+                $metroRichting.classList.add("metro-richting");
 
-				$tijd.innerText = time;
-				$tijd.classList.add("vertrektijd");
+                $el.appendChild($eta);
+                $el.appendChild($tijd);
+                $el.appendChild($metroRichting);
+                $el.appendChild($categorie);
 
-				$eta.innerText = Math.round(ETA) + " min.";
-				$eta.classList.add("eta");
-
-				$categorie.innerText = category.text;
-				$categorie.classList.add("categorie");
-
-				// Voeg metro en richting toe aan de nieuwe div
-				$metroRichting.appendChild($metro);
-				$metroRichting.appendChild($richting);
-				$metroRichting.classList.add("metro-richting"); // Geef de nieuwe div een class
-
-				$el.appendChild($eta);
-				$el.appendChild($tijd);
-				$el.appendChild($metroRichting); // Voeg de nieuwe div toe aan $el
-				$el.appendChild($categorie);
-
-				wrapper.querySelector("main").appendChild($el);
-			});
-
-		})
-		.catch(err => {
-			console.log(err);
-		})
+                wrapper.querySelector("main").appendChild($el);
+            });
+        })
+        .catch(err => {
+            console.error("Fout bij ophalen of verwerken van tijden:", err);
+        });
 }
-
-
 
 function getCategoryText(eta, distance) {
 	if (eta - distance < 0) return { status: "bad", text: "Ga je niet halen" };
