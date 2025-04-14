@@ -1,11 +1,15 @@
 const puppeteer = require('puppeteer');
 
-(async () => {
-  // Start browser
-  const browser = await puppeteer.launch();
+async function fetchDepartures() {
+  const browser = await puppeteer.launch({
+    headless: true,
+    executablePath: "/usr/bin/chromium-browser", // belangrijk voor Render!
+    args: ["--no-sandbox", "--disable-setuid-sandbox"]
+  });
+
   const page = await browser.newPage();
 
-  // Navigeer naar de 9292 pagina
+  // Navigeer naar de 9292-pagina
   await page.goto('https://9292.nl/locaties/rotterdam_metrostation-marconiplein/departures?modalityGroup=Subway', {
     waitUntil: 'networkidle0',
   });
@@ -26,9 +30,8 @@ const puppeteer = require('puppeteer');
     });
   });
 
-  // Toon de resultaten
-  console.log(departures);
-
-  // Sluit browser
   await browser.close();
-})();
+  return departures;
+}
+
+module.exports = fetchDepartures;

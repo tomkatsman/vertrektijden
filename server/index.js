@@ -31,7 +31,12 @@ app.get("/getTimes", async (req, res) => {
 
     try {
         // Start Puppeteer
-        const browser = await puppeteer.launch();
+        const browser = await puppeteer.launch({
+            headless: true,
+            executablePath: "/usr/bin/chromium-browser",
+            args: ["--no-sandbox", "--disable-setuid-sandbox"]
+          });
+        
         const page = await browser.newPage();
 
         // Navigeer naar de juiste pagina van 9292
