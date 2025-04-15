@@ -8,6 +8,8 @@ async function fetchDepartures() {
 
   try {
     const page = await browser.newPage();
+
+    await page.emulateTimezone('Europe/Amsterdam');
     
     // Enable console logging
     page.on('console', msg => console.log('PAGE LOG:', msg.text()));
@@ -39,18 +41,10 @@ async function fetchDepartures() {
       }
 
       return Array.from(rows).map(row => {
-        const timeText = row.querySelector('.flex.flex-col.font-bold span')?.textContent?.trim() || '';
+        const time = row.querySelector('.flex.flex-col.font-bold span')?.textContent?.trim() || '';
         const metroLine = row.querySelector('.c-modality-service-label')?.textContent?.trim() || '';
         const destination = row.querySelector('.flex.w-full.flex-1.flex-col span')?.textContent?.trim() || '';
         const perron = row.querySelector('.flex.flex-col.justify-center span:last-child')?.textContent?.trim() || '';
-        
-        // Create a date object with the current date and the extracted time
-        const [hours, minutes] = timeText.split(':').map(Number);
-        const now = new Date();
-        const departureTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes);
-        
-        // Format the time in ISO format with timezone
-        const time = departureTime.toISOString();
         
         console.log('Extracted data:', { time, metroLine, destination, perron });
         return { time, metroLine, destination, perron };
