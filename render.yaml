@@ -3,8 +3,5 @@ services:
     name: vertrektijden
     env: node
     nodeVersion: 18.17.0
-    buildCommand: |
-      npm install
-      PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true npm install puppeteer
-      npm install @sparticuz/chromium
+    buildCommand: npm install
     startCommand: npm start
