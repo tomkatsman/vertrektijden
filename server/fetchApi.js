@@ -3,6 +3,7 @@ const puppeteer = require('puppeteer');
 async function fetchDepartures() {
   const browser = await puppeteer.launch({
     headless: true,
+    executablePath: puppeteer.executablePath(), // voeg deze regel toe!
     args: ['--no-sandbox', '--disable-setuid-sandbox']
   });
 
