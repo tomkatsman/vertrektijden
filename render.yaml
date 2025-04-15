@@ -3,12 +3,5 @@ services:
     name: vertrektijden
     env: node
     nodeVersion: 18.17.0
-    envVars:
-      - key: PUPPETEER_SKIP_CHROMIUM_DOWNLOAD
-        value: true
-      - key: PUPPETEER_EXECUTABLE_PATH
-        value: /opt/render/.cache/puppeteer/chrome/linux-127.0.6533.88/chrome-linux64/chrome
-    buildCommand: |
-      npm install --production
-      npm install @sparticuz/chromium puppeteer --no-save
+    buildCommand: npm install
     startCommand: npm start
