@@ -3,10 +3,10 @@ const chromium = require('@sparticuz/chromium');
 
 async function fetchDepartures() {
   const browser = await puppeteer.launch({
+    headless: chromium.headless,
+    executablePath: await chromium.executablePath(),
     args: chromium.args,
     defaultViewport: chromium.defaultViewport,
-    executablePath: await chromium.executablePath,
-    headless: chromium.headless,
     ignoreHTTPSErrors: true,
   });
 
