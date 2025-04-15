@@ -2,5 +2,9 @@ services:
   - type: web
     name: vertrektijden
     env: node
-    buildCommand: npm install && npx puppeteer browsers install chrome
+    nodeVersion: 18.17.0
+    buildCommand: |
+      npm install
+      PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true npm install puppeteer
+      npm install @sparticuz/chromium
     startCommand: npm start
