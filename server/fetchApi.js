@@ -3,7 +3,6 @@ const puppeteer = require('puppeteer');
 async function fetchDepartures() {
   const browser = await puppeteer.launch({
     headless: true,
-    executablePath: "/usr/bin/chromium-browser", // belangrijk voor Render!
     args: ["--no-sandbox", "--disable-setuid-sandbox"]
   });
 
