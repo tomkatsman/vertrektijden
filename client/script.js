@@ -2,18 +2,26 @@ document.addEventListener("DOMContentLoaded", () => {
 	const loader = document.querySelector(".loader");
 	const main = document.querySelector("main");
 	const buttons = document.querySelectorAll("button");
+	const wrapper = document.querySelector("#wrapper");
+
+	const now = new Date();
+	const is_afternoon = now.getHours() > 13;
+	let perron = is_afternoon ? 1 : 2;
+
+	// Set initial active button
+	document.querySelector(`#btn-${perron === 1 ? 'westwaards' : 'oostwaards'}`).classList.add('active');
 
 	buttons.forEach((btn) => {
 		btn.addEventListener("click", () => {
 			buttons.forEach((b) => b.classList.remove("active"));
 			btn.classList.add("active");
 
-			const perron = btn.dataset.perron;
+			perron = btn.dataset.perron;
 			loadDepartures(perron);
 		});
 	});
 
-	loadDepartures(); // standaard bij laden
+	loadDepartures(perron); // Initial load
 });
 
 function loadDepartures(perronFilter = null) {
@@ -22,7 +30,7 @@ function loadDepartures(perronFilter = null) {
 	main.innerHTML = "";
 	loader.classList.add("show");
 
-	fetch("http://localhost:3000/getTimes")
+	fetch("https://vertrektijden.onrender.com/getTimes")
 		.then((res) => res.json())
 		.then((data) => {
 			loader.classList.remove("show");
@@ -37,40 +45,89 @@ function loadDepartures(perronFilter = null) {
 
 function renderDepartures(data, perronFilter) {
 	const main = document.querySelector("main");
+	const wrapper = document.querySelector("#wrapper");
+	const limit = 8;
+	const looptijden = {
+		"metrostation-marconiplein": 3,
+	}
+
 	main.innerHTML = "";
 
-	data.forEach((item) => {
-		if (perronFilter && !item.perron.includes(perronFilter)) return;
+	const nu = new Date();
+	const vandaag = {
+		dag: nu.getDate().toString().padStart(2, '0'),
+		maand: (nu.getMonth() + 1).toString().padStart(2, '0'),
+		jaar: nu.getFullYear()
+	}
 
-		const div = document.createElement("div");
-		div.classList.add("departure");
+	data.forEach((t, i) => {
+		if (i >= limit) return;
+		if (perronFilter && !t.perron.includes(perronFilter)) return;
 
-		const eta = document.createElement("div");
-		eta.classList.add("eta");
-		eta.textContent = item.time;
+		const time = t.time.includes(':') ? t.time : `${t.time.slice(0, 2)}:${t.time.slice(2)}`;
+		const [hours, minutes] = time.split(':');
+		const departureTime = new Date();
+		departureTime.setHours(parseInt(hours), parseInt(minutes), 0, 0);
 
-		const richting = document.createElement("div");
-		richting.classList.add("metro-richting");
-		richting.innerHTML = `${getMetroBadge(item.metroLine)} ${item.destination}`;
+		const ETA = Math.max(0, Math.round((departureTime - nu) / 1000 / 60));
 
-		const perron = document.createElement("div");
-		perron.classList.add("vertrektijd");
-		perron.textContent = item.perron;
+		const looptijd = looptijden["metrostation-marconiplein"];
+		const metro = t.metroLine;
+		const richting = t.destination;
 
-		div.appendChild(eta);
-		div.appendChild(richting);
-		div.appendChild(perron);
+		const $el = document.createElement("div");
+		const $metroRichting = document.createElement("div");
 
-		main.appendChild(div);
+		const $metro = document.createElement("span");
+		const $richting = document.createElement("span");
+		const $tijd = document.createElement("div");
+		const $eta = document.createElement("div");
+		const $categorie = document.createElement("div");
+
+		const category = getCategoryText(ETA, looptijd);
+
+		$el.classList.add("departure");
+		$el.classList.add(category.status);
+
+		$metro.innerText = metro;
+		if (metro === 'A') {
+			$metro.classList.add('metro-a');
+		} else if (metro === 'B') {
+			$metro.classList.add('metro-b');
+		} else if (metro === 'C') {
+			$metro.classList.add('metro-c');
+		}
+
+		$richting.innerText = richting;
+		$richting.classList.add("richting");
+
+		$tijd.innerText = time;
+		$tijd.classList.add("vertrektijd");
+
+		$eta.innerText = isNaN(ETA) ? 'N/A' : `${ETA} min.`;
+		$eta.classList.add("eta");
+
+		$categorie.innerText = category.text;
+		$categorie.classList.add("categorie");
+
+		$metroRichting.appendChild($metro);
+		$metroRichting.appendChild($richting);
+		$metroRichting.classList.add("metro-richting");
+
+		$el.appendChild($eta);
+		$el.appendChild($tijd);
+		$el.appendChild($metroRichting);
+		$el.appendChild($categorie);
+
+		main.appendChild($el);
 	});
 }
 
-function getMetroBadge(line) {
-	const classMap = {
-		A: "metro-a",
-		B: "metro-b",
-		C: "metro-c",
-	};
-	const cls = classMap[line] || "";
-	return `<span class="${cls}">${line}</span>`;
+function getCategoryText(eta, distance) {
+	if (isNaN(eta)) return { status: "bad", text: "Tijd onbekend" };
+	if (eta - distance < 0) return { status: "bad", text: "Ga je niet halen" };
+	if (eta - distance === 0) return { status: "bad", text: "Als je rent" };
+	if (eta - distance > 0 && eta - distance < 3) return { status: "good", text: "Goede tijd. 1-3 minuten wachten" };
+	if (eta - distance >= 3 && eta - distance < 5) return { status: "okay", text: "Rustig aan. 3-5 minuten wachten" };
+	return { status: "bad", text: `> ${Math.round(eta - distance)} minuten wachten` };
 }
