@@ -3,7 +3,7 @@ const puppeteer = require('puppeteer');
 async function fetchDepartures() {
   const browser = await puppeteer.launch({
     headless: true,
-    executablePath: puppeteer.executablePath(), // voeg deze regel toe!
+    executablePath: '/opt/render/.cache/puppeteer/chrome/linux-127.0.6533.88/chrome-linux64/chrome',
     args: ['--no-sandbox', '--disable-setuid-sandbox']
   });
 
