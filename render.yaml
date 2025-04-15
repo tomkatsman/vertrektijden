@@ -2,6 +2,5 @@ services:
   - type: web
     name: vertrektijden
     env: node
-    buildCommand: |
-      PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true npm install
+    buildCommand: npm install && npx puppeteer browsers install chrome
     startCommand: npm start

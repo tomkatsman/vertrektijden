@@ -1,13 +1,10 @@
 const puppeteer = require('puppeteer');
-const chromium = require('@sparticuz/chromium');
 
 async function fetchDepartures() {
   const browser = await puppeteer.launch({
-    headless: chromium.headless,
-    executablePath: await chromium.executablePath(),
-    args: chromium.args,
-    defaultViewport: chromium.defaultViewport,
-    ignoreHTTPSErrors: true,
+    headless: true,
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    executablePath: '/opt/render/.cache/puppeteer/chrome/linux-127.0.6533.88/chrome-linux64/chrome'
   });
 
   const page = await browser.newPage();
