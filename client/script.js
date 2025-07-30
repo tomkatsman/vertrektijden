@@ -25,20 +25,19 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function loadDepartures(perronFilter = null) {
-	const loader = document.querySelector(".loader");
 	const main = document.querySelector("main");
 	main.innerHTML = "";
-	loader.classList.add("show");
+	main.classList.add("loading");
 
 	fetch("https://vertrektijden.onrender.com/getTimes")
 		.then((res) => res.json())
 		.then((data) => {
-			loader.classList.remove("show");
+			main.classList.remove("loading");
 			renderDepartures(data, perronFilter);
 		})
 		.catch((err) => {
 			console.error("Fout bij ophalen vertrektijden:", err);
-			loader.classList.remove("show");
+			main.classList.remove("loading");
 			main.innerHTML = "<p style='color: black; text-align: center;'>Fout bij ophalen vertrektijden.</p>";
 		});
 }
@@ -49,7 +48,7 @@ function renderDepartures(data, perronFilter) {
 	const limit = 8;
 	const looptijden = {
 		"metrostation-marconiplein": 3,
-	}
+	};
 
 	main.innerHTML = "";
 
@@ -58,12 +57,13 @@ function renderDepartures(data, perronFilter) {
 		dag: nu.getDate().toString().padStart(2, '0'),
 		maand: (nu.getMonth() + 1).toString().padStart(2, '0'),
 		jaar: nu.getFullYear()
-	}
+	};
 
-	data.forEach((t, i) => {
-		if (i >= limit) return;
-		if (perronFilter && !t.perron.includes(perronFilter)) return;
+	const filtered = data.filter(t => {
+		return !perronFilter || t.perron.includes(perronFilter);
+	}).slice(0, limit);
 
+	filtered.forEach((t) => {
 		const time = t.time.includes(':') ? t.time : `${t.time.slice(0, 2)}:${t.time.slice(2)}`;
 		const [hours, minutes] = time.split(':');
 		const departureTime = new Date();
@@ -122,6 +122,7 @@ function renderDepartures(data, perronFilter) {
 		main.appendChild($el);
 	});
 }
+
 
 function getCategoryText(eta, distance) {
 	if (isNaN(eta)) return { status: "bad", text: "Tijd onbekend" };

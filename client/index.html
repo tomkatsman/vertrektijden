@@ -9,18 +9,11 @@
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Poppins" rel="stylesheet">
 	<style>
-		:root {
-			--primary-color: #3980F9;
-			--secondary-color: #2ecc71;
-			--font-size: 16px;
-		}
-
-
 		body {
 			margin: 0;
 			font-family: "Poppins", sans-serif;
 			-webkit-font-smoothing: antialiased;
-			background-color: var(--primary-color);
+			background-color: #3980F9;
 		}
 
 		/* select {
@@ -35,14 +28,14 @@
 			height: 40px;
 			border-radius: 5px;
 			background-color: #9EBFFC;
-			border: none;
+			border: 1px solid #ccc;
 		}
 
 		button.active {
 			background-color: #fff;
 			/* of een andere kleur */
 			font-weight: bold;
-			color: var(--primary-color);
+			color: #3980F9;
 			border: none;
 		}
 
@@ -87,17 +80,42 @@
 			display: flex;
 			flex-direction: column;
 			row-gap: 10px;
-			/* margin: 20px; */
 			background-color: #F6F9FF;
 			border-radius: 20px 20px 0 0;
+			min-height: 200px;
+			flex: 1;
+		}
+
+		#wrapper {
+			display: flex;
+			flex-direction: column;
+			min-height: 100vh;
 		}
 
 		#wrapper main.loading {
-			height: 100vh;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			min-height: calc(100vh - 100px); /* Subtract header height */
+		}
+
+		#wrapper main.loading::after {
+			content: "";
+			width: 40px;
+			height: 40px;
+			border: 4px solid #9EBFFC;
+			border-top-color: #3980F9;
+			border-radius: 50%;
+			animation: spin 1s linear infinite;
+		}
+
+		@keyframes spin {
+			to {
+				transform: rotate(360deg);
+			}
 		}
 
 		.departure {
-			display: block;
 			margin: 0 20px 0 20px;
 			padding: 20px;
 			font-size: 12px;
@@ -108,10 +126,6 @@
 			color: #333;
 			/* border: 1px solid #ccc; */
 			/* border-bottom: 1px solid #333; */
-		}
-
-		.departure.loading {
-			display: none;
 		}
 
 		.departure .eta {
@@ -130,18 +144,17 @@
 			color: #9EBFFC;
 		}
 
-		/* 
 		.departure.bad {
-			background: #9e3c3c;
+			/* background: #9e3c3c; */
 		}
 
 		.departure.okay {
-			background: #dd7745;
+			/* background: #dd7745; */
 		}
 
 		.departure.good {
-			background: #60754e;
-		} */
+			/* background: #60754e; */
+		}
 
 		.vertrektijd {
 			font-weight: bold;
@@ -161,71 +174,10 @@
 		.departure.good .vertrektijd {
 			background-color: #60754e;
 		}
-
-		.loader {
-			margin: 0 auto;
-			position: absolute;
-			width: 100px;
-			height: 100px;
-			top: 50%;
-			left: 50%;
-			transform: translate(-50%, -50%);
-			display: none;
-		}
-
-		.loader.show {
-			display: block;
-		}
-
-		.circular {
-			animation: rotate 2s linear infinite;
-			height: 100px;
-			position: relative;
-			width: 100px;
-		}
-
-		.path {
-			stroke-dasharray: 1, 200;
-			stroke-dashoffset: 0;
-			stroke: var(--primary-color);
-			animation:
-				dash 1.5s ease-in-out infinite,
-				color 6s ease-in-out infinite;
-			stroke-linecap: round;
-		}
-
-		@keyframes rotate {
-			100% {
-				transform: rotate(360deg);
-			}
-		}
-
-		@keyframes dash {
-			0% {
-				stroke-dasharray: 1, 200;
-				stroke-dashoffset: 0;
-			}
-
-			50% {
-				stroke-dasharray: 89, 200;
-				stroke-dashoffset: -35;
-			}
-
-			100% {
-				stroke-dasharray: 89, 200;
-				stroke-dashoffset: -124;
-			}
-		}
 	</style>
 </head>
 
 <body>
-	<div class="loader">
-		<svg class="circular">
-			<circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="5" stroke-miterlimit="10">
-			</circle>
-		</svg>
-	</div>
 	<div id="wrapper">
 		<header>
 			<h1>Marconiplein</h1>
@@ -235,9 +187,9 @@
 			</select> -->
 			<button id="btn-oostwaards" data-perron="2">Oost</button>
 			<button id="btn-westwaards" data-perron="1">West</button>
+
 		</header>
-		<main>
-		</main>
+		<main></main>
 	</div>
 	<script src="script.js"></script>
 </body>
