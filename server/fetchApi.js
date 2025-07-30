@@ -27,6 +27,17 @@ async function fetchDepartures() {
 
     page.on('console', msg => console.log('PAGE LOG:', msg.text()));
 
+    await page.setRequestInterception(true);
+
+    page.on('request', (req) => {
+      const blocked = ['image', 'stylesheet', 'font', 'media'];
+      if (blocked.includes(req.resourceType())) {
+        req.abort(); // Skip
+      } else {
+        req.continue(); // Allow
+      }
+    });
+
     await page.goto('https://9292.nl/locaties/rotterdam_metrostation-marconiplein/departures?modalityGroup=Subway', {
       waitUntil: 'networkidle0',
       timeout: 30000
