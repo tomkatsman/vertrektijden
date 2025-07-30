@@ -1,6 +1,8 @@
 const puppeteer = require('puppeteer');
 
 async function fetchDepartures() {
+  console.log('📍 Executable path:', puppeteer.executablePath())
+
   const browser = await puppeteer.launch({
     headless: true,
     executablePath: puppeteer.executablePath(),
