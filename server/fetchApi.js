@@ -1,42 +1,50 @@
+require('dotenv').config();
 const puppeteer = require('puppeteer');
-require("dotenv" ).config();
 
 async function fetchDepartures() {
-  const browser = await puppeteer.launch({
+  const launchOptions = {
     headless: true,
-    executablePath: process. env.PUPPETEER_EXECUTABLE_PATH,
-    args: ['--no-sandbox', '--disable-setuid-sandbox']
-  });
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--single-process',
+      '--no-zygote',
+    ],
+  };
+
+  // Alleen in productie het executablePath gebruiken
+  if (process.env.NODE_ENV === 'production') {
+    launchOptions.executablePath = process.env.PUPPETEER_EXECUTABLE_PATH;
+  }
+
+  let browser;
 
   try {
-    const page = await browser.newPage();
+    browser = await puppeteer.launch(launchOptions);
 
+    const page = await browser.newPage();
     await page.emulateTimezone('Europe/Amsterdam');
-    
-    // Enable console logging
+
     page.on('console', msg => console.log('PAGE LOG:', msg.text()));
-    
+
     await page.goto('https://9292.nl/locaties/rotterdam_metrostation-marconiplein/departures?modalityGroup=Subway', {
-      waitUntil: 'networkidle0', // Wait until network is idle
-      timeout: 30000 // Increase timeout to 30 seconds
+      waitUntil: 'networkidle0',
+      timeout: 30000
     });
 
     console.log('Page loaded, waiting for selector...');
-    
-    // Wait for the content to be visible
-    await page.waitForSelector('.group.grid', { 
+    await page.waitForSelector('.group.grid', {
       timeout: 15000,
-      visible: true 
+      visible: true
     });
 
     console.log('Selector found, evaluating page...');
 
     const departures = await page.evaluate(() => {
       console.log('Starting evaluation...');
-      
       const rows = document.querySelectorAll('.group.grid');
       console.log('Found rows:', rows.length);
-      
+
       if (rows.length === 0) {
         console.log('No rows found, checking page content...');
         console.log('HTML content:', document.body.innerHTML);
@@ -47,7 +55,7 @@ async function fetchDepartures() {
         const metroLine = row.querySelector('.c-modality-service-label')?.textContent?.trim() || '';
         const destination = row.querySelector('.flex.w-full.flex-1.flex-col span')?.textContent?.trim() || '';
         const perron = row.querySelector('.flex.flex-col.justify-center span:last-child')?.textContent?.trim() || '';
-        
+
         console.log('Extracted data:', { time, metroLine, destination, perron });
         return { time, metroLine, destination, perron };
       });
@@ -56,12 +64,14 @@ async function fetchDepartures() {
     console.log('Departures found:', departures.length);
     console.log('Sample departure:', departures[0]);
 
-    await browser.close();
     return departures;
   } catch (error) {
     console.error('Error in fetchDepartures:', error);
-    await browser.close();
     throw error;
+  } finally {
+    if (browser) {
+      await browser.close();
+    }
   }
 }
 
